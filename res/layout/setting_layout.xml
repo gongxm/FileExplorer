@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:gongxm="http://schemas.android.com/apk/res/com.jfst.fileexplorer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/black"
@@ -21,26 +22,38 @@
         android:layout_marginRight="10dp"
         android:background="#55ffffff" />
 
-    <RelativeLayout
+    <com.jfst.fileexplorer.ui.SettingItem
+        android:id="@+id/dir_comparator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp" >
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/item_selector"
+        gongxm:desc="优先排列文件夹，再排列其他文件#默认排序"
+        gongxm:title="文件夹优先" 
+        gongxm:flag="isDirFront"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:text="优先排列文件夹"
-            android:textColor="@android:color/white"
-            android:textSize="20sp" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="#55ffffff" />
 
-        <CheckBox
-            style="@style/mycheckbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true" />
-    </RelativeLayout>
+    <com.jfst.fileexplorer.ui.SettingItem
+        android:id="@+id/showHidden"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/item_selector"
+        gongxm:desc="显示以.开头的文件夹#不显示以.开头的文件"
+        gongxm:title="显示隐藏文件夹" 
+        gongxm:flag="isShowHidden"/>
 
     <View
         android:layout_width="match_parent"

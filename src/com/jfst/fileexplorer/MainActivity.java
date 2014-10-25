@@ -3,11 +3,13 @@ package com.jfst.fileexplorer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -20,6 +22,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.jfst.fileexplorer.Constants.Constants;
 import com.jfst.fileexplorer.adapter.FileAdapter;
 import com.jfst.fileexplorer.utils.OpenFileUtils;
 
@@ -27,6 +30,16 @@ public class MainActivity extends Activity {
 
 	private ListView listview;
 	private FileAdapter adapter;
+	
+	private boolean isShowHidden;//是否显示以.开头的隐藏文件夹
+	private boolean isDirFront;//是否优先排列文件夹
+	
+	private Comparator<File> comparator;//文件优先的比较器
+	
+	private int STATUS = 0;
+	private Toast toast;
+	private File dir;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +48,22 @@ public class MainActivity extends Activity {
 		listview = (ListView) findViewById(R.id.lv_main);
 		adapter = new FileAdapter(this, null);
 		listview.setAdapter(adapter);
-		File dir = Environment.getExternalStorageDirectory();
+		
+		//初始化比较器
+		comparator=new Comparator<File>() {
+
+			@Override
+			public int compare(File file1, File file2) {
+				if(file1.isDirectory()&&!file2.isDirectory()){
+					return -1;
+				}else if(!file1.isDirectory()&&file2.isDirectory()){
+					return 1;
+				}
+				return file1.getName().compareTo(file2.getName());
+			}
+		};
+		
+		dir = Environment.getExternalStorageDirectory();
 		if (dir == null) {
 			dir = new File("/");
 		}
@@ -46,7 +74,7 @@ public class MainActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				File dir = (File) listview.getItemAtPosition(position);
+				dir = (File) listview.getItemAtPosition(position);
 				listFiles(dir);
 			}
 		});
@@ -62,9 +90,28 @@ public class MainActivity extends Activity {
 		});
 
 		toast = Toast.makeText(this, "再按一次退出！", 0);
+		
+	
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		listFiles(dir);
+		adapter.notifyDataSetChanged();//获取到焦点时刷新界面
+	}
+	
+	
+	/**
+	 * 更新排序状态
+	 */
+	private void updateStatus(){
+		isShowHidden=MyApplication.getConfig().getBoolean(Constants.ISSHOWHIDDEN, false);
+		isDirFront=MyApplication.getConfig().getBoolean(Constants.ISDIRFRONT, false);
 	}
 
 	private void listFiles(File file) {
+		updateStatus();
 		if (file == null)
 			return;
 		else {
@@ -81,15 +128,33 @@ public class MainActivity extends Activity {
 			} else {
 				list = new ArrayList<File>();
 			}
+			//不显示隐藏文件夹
+			if(!isShowHidden){
+				CopyOnWriteArrayList<File> temp=new CopyOnWriteArrayList<File>(list);
+				for(File f:temp){
+					if(f.getName().startsWith(".")){
+						temp.remove(f);
+					}
+				}
+				list=new ArrayList<File>(temp);
+			}
+			
+			//排序
+			if(isDirFront){
+				Collections.sort(list, comparator);
+			}
 			list.add(0, file.getParentFile());
 			adapter.setData(list);
 			listview.setSelection(0);
 		}
 	}
 
-	private int STATUS = 0;
-	private Toast toast;
 
+
+	
+	/**
+	 * 设置返回键的事件
+	 */
 	@Override
 	public void onBackPressed() {
 		File file = (File) listview.getItemAtPosition(0);
@@ -114,12 +179,20 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	
+	/**
+	 * 退出时取消Toast的显示
+	 */
 	@Override
 	protected void onDestroy() {
 		toast.cancel();
 		super.onDestroy();
 	}
 
+	
+	/**
+	 * 设置菜单点击事件
+	 */
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()) {
@@ -144,6 +217,9 @@ public class MainActivity extends Activity {
 		startActivity(intent);
 	}
 
+	/**
+	 * 设置菜单项
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(0, 1, 0, "设置");
