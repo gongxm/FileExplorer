@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
@@ -24,12 +24,12 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import com.jfst.fileexplorer.Constants.Constants;
 import com.jfst.fileexplorer.adapter.FileAdapter;
 import com.jfst.fileexplorer.domain.FileItem;
 import com.jfst.fileexplorer.utils.OpenFileUtils;
 
+@SuppressLint("ShowToast")
 public class MainActivity extends Activity implements OnClickListener {
 
 	private ListView listview;
@@ -74,6 +74,9 @@ public class MainActivity extends Activity implements OnClickListener {
 			String path = MyApplication.getConfig().getString(
 					Constants.DIRPATH, "/");
 			dir = new File(path);
+			if (dir.isFile()) {
+				dir = dir.getParentFile();
+			}
 		} else {
 			if (Environment.getExternalStorageState().equals(
 					Environment.MEDIA_MOUNTED)) {
@@ -89,7 +92,8 @@ public class MainActivity extends Activity implements OnClickListener {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				dir = ((FileItem) listview.getItemAtPosition(position)).getFile();
+				dir = ((FileItem) listview.getItemAtPosition(position))
+						.getFile();
 				listFiles(dir);
 			}
 		});
@@ -104,7 +108,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 		});
 
-		toast = Toast.makeText(this, "再按一次退出！", 0);
+		toast = Toast.makeText(this, "再按一次退出！", Toast.LENGTH_SHORT);
 
 	}
 
@@ -127,6 +131,11 @@ public class MainActivity extends Activity implements OnClickListener {
 				false);
 	}
 
+	/**
+	 * 遍历文件夹
+	 * 
+	 * @param file
+	 */
 	private void listFiles(File file) {
 		updateStatus();
 		if (file == null)
@@ -162,12 +171,13 @@ public class MainActivity extends Activity implements OnClickListener {
 				Collections.sort(list, comparator);
 			}
 			list.add(0, file.getParentFile());
-			List<FileItem> items=new ArrayList<FileItem>();
-			for(File f:list){
-				items.add(new FileItem(f,false));
+			List<FileItem> items = new ArrayList<FileItem>();
+			for (File f : list) {
+				items.add(new FileItem(f, false));
 			}
 			adapter.setData(items);
 			listview.setSelection(0);
+			getWindow().setTitle(dir.getAbsolutePath());
 		}
 	}
 
@@ -227,10 +237,23 @@ public class MainActivity extends Activity implements OnClickListener {
 		case 2:
 			about();// 关于
 			break;
+		case 3:
+			toSdcard();// 转到SD卡
+			break;
 		default:
 			break;
 		}
 		return super.onMenuItemSelected(featureId, item);
+	}
+
+	private void toSdcard() {
+		if (Environment.getExternalStorageState().equals(
+				Environment.MEDIA_MOUNTED)){
+			dir = Environment.getExternalStorageDirectory();
+			listFiles(dir);
+		}else{
+			Toast.makeText(this, "sdcard不存在！", 0).show();
+		}
 	}
 
 	/**
@@ -260,6 +283,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(0, 1, 0, "设置");
+		menu.add(0, 3, 0, "转到SD卡");
 		menu.add(0, 2, 0, "关于");
 		menu.add(0, 0, 0, "退出");
 		return super.onCreateOptionsMenu(menu);
