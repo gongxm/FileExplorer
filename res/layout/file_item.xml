@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
+    android:descendantFocusability="blocksDescendants"
     android:padding="10dp" >
 
     <ImageView
@@ -12,8 +13,9 @@
         android:src="@drawable/ic_launcher" />
 
     <TextView
+        android:layout_weight="1"
         android:id="@+id/tv_file"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="35dp"
         android:layout_marginLeft="10dp"
         android:ellipsize="end"
@@ -21,5 +23,12 @@
         android:singleLine="true"
         android:text="@string/hello_world"
         android:textSize="20sp" />
+
+   <CheckBox
+        android:id="@+id/cb_list"
+        style="@style/mycheckbox"
+        android:padding="0dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

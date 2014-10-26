@@ -26,14 +26,14 @@
         android:id="@+id/dir_comparator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:background="@drawable/item_selector"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
         gongxm:desc="优先排列文件夹，再排列其他文件#默认排序"
-        gongxm:title="文件夹优先" 
-        gongxm:flag="isDirFront"/>
+        gongxm:flag="isDirFront"
+        gongxm:title="文件夹优先" />
 
     <View
         android:layout_width="match_parent"
@@ -46,14 +46,34 @@
         android:id="@+id/showHidden"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:background="@drawable/item_selector"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
         gongxm:desc="显示以.开头的文件夹#不显示以.开头的文件"
-        gongxm:title="显示隐藏文件夹" 
-        gongxm:flag="isShowHidden"/>
+        gongxm:flag="isShowHidden"
+        gongxm:title="显示隐藏文件夹" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="#55ffffff" />
+    
+      <com.jfst.fileexplorer.ui.SettingItem
+        android:id="@+id/savepath"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/item_selector"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        gongxm:desc="退出时保存最后的路径#退出时不保存最后的路径"
+        gongxm:flag="isSavePath"
+        gongxm:title="退出时保存路径" />
 
     <View
         android:layout_width="match_parent"

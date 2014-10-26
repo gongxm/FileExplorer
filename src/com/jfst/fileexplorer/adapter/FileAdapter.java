@@ -7,21 +7,25 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jfst.fileexplorer.R;
+import com.jfst.fileexplorer.domain.FileItem;
 
 public class FileAdapter extends BaseAdapter {
 	private Context context;
-	private List<File> list;
+	private List<FileItem> list;
 
-	public void setData(List<File> list) {
+	public void setData(List<FileItem> list) {
 		this.list = list;
 		notifyDataSetChanged();
 	}
 
-	public FileAdapter(Context context, List<File> list) {
+	public FileAdapter(Context context, List<FileItem> list) {
 		this.context = context;
 		this.list = list;
 	}
@@ -45,15 +49,17 @@ public class FileAdapter extends BaseAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder holder;
+		final FileItem item = list.get(position);
 		if (convertView == null) {
 			convertView = View.inflate(context, R.layout.file_item, null);
 			holder = new ViewHolder();
 			holder.iv_file = (ImageView) convertView.findViewById(R.id.iv_file);
 			holder.tv_file = (TextView) convertView.findViewById(R.id.tv_file);
+			holder.checkbox = (CheckBox) convertView.findViewById(R.id.cb_list);
 			convertView.setTag(holder);
 		}
 		holder = (ViewHolder) convertView.getTag();
-		File file = list.get(position);
+		File file = item.getFile();
 		if (file == null) {
 			holder.iv_file.setImageResource(R.drawable.back);
 		} else if (file.isDirectory()) {
@@ -105,21 +111,30 @@ public class FileAdapter extends BaseAdapter {
 			holder.iv_file.setImageResource(R.drawable.mp4);
 		} else if (file.getName().endsWith(".ape")) {
 			holder.iv_file.setImageResource(R.drawable.ape);
-		}else if (file.getName().endsWith(".flac")) {
+		} else if (file.getName().endsWith(".flac")) {
 			holder.iv_file.setImageResource(R.drawable.flac);
 		} else {
 			holder.iv_file.setImageResource(R.drawable.unknown);
 		}
+		holder.checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton compoundbutton, boolean isChecked) {
+				item.setChecked(isChecked);
+			}
+		});
+		holder.checkbox.setChecked(item.isChecked());
 		if (position == 0) {
-			if (file==null) {
+			if (file == null) {
 				holder.iv_file.setImageResource(R.drawable.root);
 				holder.tv_file.setText("根目录");
 			} else {
 				holder.iv_file.setImageResource(R.drawable.back);
 				holder.tv_file.setText("返回上一层");
 			}
+			holder.checkbox.setVisibility(View.INVISIBLE);
 		} else {
 			holder.tv_file.setText(file.getName());
+			holder.checkbox.setVisibility(View.VISIBLE);
 		}
 		return convertView;
 	}
@@ -127,6 +142,7 @@ public class FileAdapter extends BaseAdapter {
 	private class ViewHolder {
 		ImageView iv_file;
 		TextView tv_file;
+		CheckBox checkbox;
 	}
 
 }
